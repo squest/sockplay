@@ -16,8 +16,6 @@ var transContent = function  (domElmt) {
 
 app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
 	$scope.messages = [];
-
-
 	var myWebSocket = new WebSocket("ws://localhost:3000/ws");
 
 	myWebSocket.onopen = function(evt) {
