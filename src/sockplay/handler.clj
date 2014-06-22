@@ -10,6 +10,7 @@
             [ring.middleware.session :as session]))
 
 (defonce server (atom nil))
+(def popop (atom 0))
 
 (defn stop-server []
   (when-not (nil? @server)
@@ -21,23 +22,42 @@
 (def channels (atom []))
 (def current-user (atom ""))
 
-(defn on-receive-message
+(defn send-message
   [data]
   (loop [ch @channels]
     (if (empty? ch)
-      (do (println @channels))
-      (recur (do (send! (:channel (first ch))
-                        (let [map-data (cs/parse-string data true)]
-                          (-> (assoc map-data :type "message")
-                              (cs/generate-string)))
-                        false)
-                 (rest ch))))))
+        (do (println @channels))
+        (recur (do (send! (:channel (first ch))
+                          (let [map-data (cs/parse-string data true)]
+                            (-> (assoc map-data :type "message")
+                                (cs/generate-string)))
+                          false)
+                   (rest ch))))))
+
+(defn send-soal
+  [data]
+  (loop [ch @channels]
+    (if (empty? ch)
+        (do (println @channels))
+        (recur (do (send! (:channel (first ch))
+                          (let [map-data (cs/parse-string data true)]
+                            (-> (assoc map-data :type "soal")
+                                (cs/generate-string)))
+                          false)
+                   (rest ch))))))
 
 (defn on-receive-data
   [data]
   (let [chan-data (cs/parse-string data true)]
     (cond (= "message" (:dataType chan-data))
-          (on-receive-message data))))
+          (if (zero? (rem @popop 10))
+              (do (send-message data)
+                  (send-soal data)
+                  (swap! popop inc))
+              (do (send-message data)
+                  (swap! popop inc)))
+          (= "answer" (:dataType chan-data))
+          (println chan-data))))
 
 (defn on-channel-close [channel]
   (fn [status]

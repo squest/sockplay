@@ -13,18 +13,51 @@ var transContent = function  (domElmt) {
 	Jacked.fadeIn(content, {duration: AnimDuration});
 };
 
+app.run(['$rootScope', function ($rootScope) {
+	$rootScope.myWebSocket = new WebSocket("ws://localhost:3000/ws");
+}])
+
+app.directive('zensoal', [function () {
+	return {
+
+		templateUrl: '/directive-templates/zensoal.html',
+		replace: false,
+		transclude: true,
+		restrict: 'E',
+		scope: {},
+		controller: function ($scope, $element, $attrs, $transclude, $rootScope) {
+			$scope.answerSoal = function ( answer ) {
+				var packageJawaban = {
+					user : user,
+					dataType : "answer",
+					message : answer
+				}
+				$rootScope.myWebSocket.send(JSON.stringify(packageJawaban));
+				console.log(packageJawaban);
+			}
+		},
+		compile: function compile(tElement, tAttrs, transclude) {
+			return function postLink(scope, iElement, iAttrs, controller) {
+
+			}
+		},
+		link: function postLink(scope, elmt, attrs) {
+
+		}
+	};
+}])
 
 
-app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
+app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
 	$scope.messages = [];
-	var myWebSocket = new WebSocket("ws://localhost:3000/ws");
 
-	myWebSocket.onopen = function(evt) {
+
+	$rootScope.myWebSocket.onopen = function(evt) {
 
 		console.log(evt);
 	};
 
-	myWebSocket.onmessage = function(evt) {
+	$rootScope.myWebSocket.onmessage = function(evt) {
 		var dataPackage = JSON.parse(evt.data);
 
 		if (dataPackage.type == "new-user") {
@@ -37,16 +70,14 @@ app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
 			}
 
 		}
-		if (dataPackage.type == "message") {
+		if ((dataPackage.type == "message") || (dataPackage.type == "soal")) {
 			$scope.messages.unshift(dataPackage);
 			if ($scope.messages.length > 50) {
 				$scope.messages.pop();
 			}
 
 		}
-		if (dataPackage.type == "soal"){
 
-		}
 		$scope.$digest();
 		transContent('message0');
 		console.log(evt);
@@ -59,7 +90,7 @@ app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
 				message: message,
 				dataType : "message"
 			};
-			myWebSocket.send(JSON.stringify(data));
+			$rootScope.myWebSocket.send(JSON.stringify(data));
 			$scope.message = "";
 		}
 
