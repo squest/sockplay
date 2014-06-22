@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<!-- external CSS -->
+	<link rel="stylesheet" href="ext-css/normalize.css">
+	<link rel="stylesheet" href="ext-css/foundation.min.css">
+
+	<!-- app CSS -->
+
+	<link rel="stylesheet" href="app-scss/main-style.css">
+
+	<!-- external JS -->
+
+	<script type="text/javascript" src="ext-js/angular.min.js"></script>
+	<script type="text/javascript" src="ext-js/jacked.min.js"></script>
+
+	<!-- App JS -->
+
+	<!-- external JS to be put just before the end of the body -->
+	<script type="text/javascript" src="ext-js/jquery.min.js"></script>
+	<script type="text/javascript" src="ext-js/foundation.min.js"></script>
+
+	<title>
+		{{page.title}}
+	</title>
+</head>
+<body class="row">
+<header>
+	<h1>{{page.headline}}</h1>
+
+	<div class="large-4 large-centered columns">
+		<form action="/login" method="post">
+			<input type="text" name="username"/>
+			<button type="submit">Submit</button>
+		</form>
+	</div>
+
+
+</header>
+<script>
+
+</script>
+<footer>
+</footer>
+</body>
+</html>

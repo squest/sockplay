@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+	   <!-- external CSS -->
+	   <link rel="stylesheet" href="ext-css/normalize.css">
+	   <link rel="stylesheet" href="ext-css/foundation.min.css">
+
+	   <!-- app CSS -->
+
+	   <link rel="stylesheet" href="app-scss/main-style.css">
+	   <script>
+		   var user= "{{user}}";
+	   </script>
+	   <!-- external JS -->
+
+	   <script type="text/javascript" src="ext-js/angular.min.js"></script>
+	   <script type="text/javascript" src="ext-js/jacked.min.js"></script>
+
+	   <!-- App JS -->
+
+
+	   <script type="text/javascript" src="main-app.js"></script>
+
+
+	   <!-- external JS to be put just before the end of the body -->
+	   <script type="text/javascript" src="ext-js/jquery.min.js"></script>
+	   <script type="text/javascript" src="ext-js/foundation.min.js"></script>
+
+	   <title>
+         {{page.title}}
+      </title>
+   </head>
+   {% verbatim %}
+
+
+<body ng-app="chatApp" ng-controller="MainCtrl" class="large-12 column">
+   <header class="large-9 column">
+
+	   <form>
+
+
+		   <fieldset>
+			   <div class="large-10 columns">
+				   <input type="text" ng-model="message"/>
+			   </div>
+			   <div class="large-2 columns">
+				   <button ng-click="sendChat(message)" class="small">Send</button>
+			   </div>
+		   </fieldset>
+
+	   </form>
+	   <div>
+		   <p id="message{{$index}}" ng-repeat="item in messages" ng-class-even="'zpanel1'" ng-class-odd="'zpanel2'">
+
+			   <span style="color: #5a009e;">{{item.user}}</span> :
+			   <span style="color: #333333">{{item.message}} </span>
+
+	      </p>
+	   </div>
+   </header>
+   <div class="large-3 column">
+	   <fieldset>
+		   <legend>Users' list</legend>
+		   <ol>
+			   <li ng-repeat="item in users" >
+				   {{item.user}}
+			   </li>
+		   </ol>
+		   <!-- <div ng-show="userCabut == true">
+		   			   <h4>
+		   				   Eh ada yang cabut
+		   			   </h4>
+		   		   </div>
+		   		   <div ng-show="userMasuk == true">
+		   			   <h4>
+		   				   Yoih si itu masuk
+		   			   </h4>
+		   		   </div> -->
+	   </fieldset>
+   </div>
+
+   <footer>
+	   <hr/>
+	   Copyright 2014 Jojon & Associates
+   </footer>
+</body>
+   {% endverbatim %}
+</html>

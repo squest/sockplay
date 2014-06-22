@@ -1,0 +1,43 @@
+<!-- external CSS -->
+<link rel="stylesheet" href="/ext-css/normalize.css">
+<link rel="stylesheet" href="/ext-css/foundation.min.css">
+
+<!-- app CSS -->
+
+<link rel="stylesheet" href="/app-scss/main-style.css">
+
+<!-- external JS -->
+
+<script src="/ext-js/angular.min.js"></script>
+<script src="/ext-js/angular-route.min.js"></script>
+<script src="/ext-js/angular-sanitize.min.js"></script>
+<script src="/ext-js/angular-resources.min.js"></script>
+<script src="/ext-js/angular-animate.min.js"></script>
+<script src="/ext-js/angular-ui-router.min.js"></script>
+<script src="/ext-js/jacked.min.js"></script>
+
+<!-- App JS -->
+
+<script src="/app-js/config.js"></script>
+<script src="/app-js/main-app.js"></script>
+
+<!-- Special case when using clojurescript -->
+<script src="/app-js/main-cljs.js"></script>
+
+
+<!-- MathJax setting -->
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+<script type="text/javascript">
+    window.MathJax = {
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        processEscapes: false
+      }
+    };
+</script>
+
+
+<!-- external JS to be put just before the end of the body -->
+<script src="/ext-js/jquery.min.js"></script>
+<script src="/ext-js/foundation.min.js"></script>
