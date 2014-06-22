@@ -14,6 +14,7 @@ var transContent = function  (domElmt) {
 };
 
 
+
 app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
 	$scope.messages = [];
 	var myWebSocket = new WebSocket("ws://localhost:3000/ws");
@@ -41,6 +42,9 @@ app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
 			if ($scope.messages.length > 50) {
 				$scope.messages.pop();
 			}
+
+		}
+		if (dataPackage.type == "soal"){
 
 		}
 		$scope.$digest();

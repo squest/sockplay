@@ -4,6 +4,8 @@
         [compojure.core :only [defroutes GET POST DELETE ANY context]]
         org.httpkit.server)
   (:require [selmer.parser :as page]
+            [com.ashafa.clutch :as cl]
+            [couchbase-clj.client :as cc]
             [cheshire.core :as cs]
             [ring.middleware.session :as session]))
 
@@ -43,14 +45,14 @@
                   (vec (remove #(= channel (:channel %)) @channels)))
           (loop [ch @channels]
             (if (empty? ch)
-              (do (println @channels))
-              (recur (do (send! (:channel (first ch))
-                                (-> {:type "new-user"
-                                     :list (-> #(dissoc % :channel)
-                                               (map @channels))}
-                                    (cs/generate-string))
-                                false)
-                         (rest ch))))))))
+                (do (println @channels))
+                (recur (do (send! (:channel (first ch))
+                                  (-> {:type "new-user"
+                                       :list (-> #(dissoc % :channel)
+                                                 (map @channels))}
+                                      (cs/generate-string))
+                                  false)
+                           (rest ch))))))))
 
 (defn on-open
   [channel]
@@ -60,14 +62,14 @@
                                 :channel channel})
           (loop [ch @channels]
             (if (empty? ch)
-              (do (println @channels))
-              (recur (do (send! (:channel (first ch))
-                                (-> {:type "new-user"
-                                     :list (-> #(dissoc % :channel)
-                                               (map @channels))}
-                                    (cs/generate-string))
-                                false)
-                         (rest ch))))))
+                (do (println @channels))
+                (recur (do (send! (:channel (first ch))
+                                  (-> {:type "new-user"
+                                       :list (-> #(dissoc % :channel)
+                                                 (map @channels))}
+                                      (cs/generate-string))
+                                  false)
+                           (rest ch))))))
       (println "HTTP channel")))
 
 (defn handler [req]
@@ -98,7 +100,9 @@
            (GET "/chat" req
                 (do (println req)
                     (chatpage (:user (:my-session req)))))
-           (GET "/ws" req (handler req))       ;; websocket
+           (GET "/ws" req
+                (do (println req)
+                    (handler req)))       ;; websocket
            (files "/" {:root "resources/public/"}) ;; static file url prefix /static, in `public` folder
            (not-found "<p>Page not found.</p>")
            (resources "/" {:root "resources/public/"})) ;; all other, return 404

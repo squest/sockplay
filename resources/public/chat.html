@@ -53,8 +53,13 @@
 	   <div>
 		   <p id="message{{$index}}" ng-repeat="item in messages" ng-class-even="'zpanel1'" ng-class-odd="'zpanel2'">
 
-			   <span style="color: #5a009e;">{{item.user}}</span> :
-			   <span style="color: #333333">{{item.message}} </span>
+			   <span ng-if="item.type == 'message'">
+				   <span style="color: #5a009e;">{{item.user}}</span> :
+					<span style="color: #333333">{{item.message}} </span>
+			   </span>
+			   <span ng-if="item.type == 'soal'">
+
+			   </span>
 
 	      </p>
 	   </div>

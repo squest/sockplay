@@ -13,7 +13,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Leiningen: cheshire:5.3.1" level="project" />
     <orderEntry type="library" name="Leiningen: clojure-complete:0.2.3" level="project" />
+    <orderEntry type="library" name="Leiningen: com.ashafa/clutch:0.4.0-RC1" level="project" />
     <orderEntry type="library" name="Leiningen: compojure:1.1.8" level="project" />
+    <orderEntry type="library" name="Leiningen: couchbase-clj:0.1.3" level="project" />
     <orderEntry type="library" name="Leiningen: http-kit:2.1.16" level="project" />
     <orderEntry type="library" name="Leiningen: javax.servlet/servlet-api:2.5" level="project" />
     <orderEntry type="library" name="Leiningen: lib-noir:0.8.4" level="project" />
@@ -24,11 +26,28 @@
     <orderEntry type="library" name="Leiningen: com.fasterxml.jackson.core/jackson-core:2.3.1" level="project" />
     <orderEntry type="library" name="Leiningen: com.fasterxml.jackson.dataformat/jackson-dataformat-smile:2.3.1" level="project" />
     <orderEntry type="library" name="Leiningen: tigris:0.1.1" level="project" />
+    <orderEntry type="library" name="Leiningen: clj-http:0.5.5" level="project" />
+    <orderEntry type="library" name="Leiningen: com.cemerick/url:0.0.6" level="project" />
+    <orderEntry type="library" name="Leiningen: commons-codec:1.6" level="project" />
+    <orderEntry type="library" name="Leiningen: commons-io:2.4" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.httpcomponents/httpclient:4.2.1" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.httpcomponents/httpmime:4.2.1" level="project" />
+    <orderEntry type="library" name="Leiningen: slingshot:0.10.3" level="project" />
+    <orderEntry type="library" name="Leiningen: commons-logging:1.1.1" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/core.incubator:0.1.0" level="project" />
+    <orderEntry type="library" name="Leiningen: pathetic:0.4.0" level="project" />
     <orderEntry type="library" name="Leiningen: org.clojure/tools.macro:0.1.0" level="project" />
     <orderEntry type="library" name="Leiningen: ring/ring-core:1.2.2" level="project" />
     <orderEntry type="library" name="Leiningen: clj-time:0.4.4" level="project" />
     <orderEntry type="library" name="Leiningen: commons-fileupload:1.3" level="project" />
-    <orderEntry type="library" name="Leiningen: commons-io:2.4" level="project" />
+    <orderEntry type="library" name="Leiningen: com.couchbase.client/couchbase-client:1.3.2" level="project" />
+    <orderEntry type="library" name="Leiningen: org.clojure/data.json:0.2.4" level="project" />
+    <orderEntry type="library" name="Leiningen: io.netty/netty:3.5.5.Final" level="project" />
+    <orderEntry type="library" name="Leiningen: net.spy/spymemcached:2.10.5" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.httpcomponents/httpcore-nio:4.3" level="project" />
+    <orderEntry type="library" name="Leiningen: org.apache.httpcomponents/httpcore:4.3" level="project" />
+    <orderEntry type="library" name="Leiningen: org.codehaus.jettison/jettison:1.1" level="project" />
+    <orderEntry type="library" name="Leiningen: stax/stax-api:1.0.1" level="project" />
     <orderEntry type="library" name="Leiningen: clout:1.2.0" level="project" />
     <orderEntry type="library" name="Leiningen: hiccup:1.0.5" level="project" />
     <orderEntry type="library" name="Leiningen: org.mindrot/jbcrypt:0.3m" level="project" />
@@ -56,7 +75,6 @@
     <orderEntry type="library" name="Leiningen: org.eclipse.jetty/jetty-io:7.6.13.v20130916" level="project" />
     <orderEntry type="library" name="Leiningen: org.eclipse.jetty/jetty-util:7.6.13.v20130916" level="project" />
     <orderEntry type="library" name="Leiningen: ring/ring-codec:1.0.0" level="project" />
-    <orderEntry type="library" name="Leiningen: commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Leiningen: joda-time:2.3" level="project" />
   </component>
 </module>
