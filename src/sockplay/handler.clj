@@ -19,47 +19,63 @@
 (def channels (atom []))
 (def current-user (atom ""))
 
+(defn on-receive-message
+  [data]
+  (loop [ch @channels]
+    (if (empty? ch)
+      (do (println @channels))
+      (recur (do (send! (:channel (first ch))
+                        (let [map-data (cs/parse-string data true)]
+                          (-> (assoc map-data :type "message")
+                              (cs/generate-string)))
+                        false)
+                 (rest ch))))))
+
+(defn on-receive-data
+  [data]
+  (let [chan-data (cs/parse-string data true)]
+    (cond (= "message" (:dataType chan-data))
+          (on-receive-message data))))
+
+(defn on-channel-close [channel]
+  (fn [status]
+      (do (reset! channels
+                  (vec (remove #(= channel (:channel %)) @channels)))
+          (loop [ch @channels]
+            (if (empty? ch)
+              (do (println @channels))
+              (recur (do (send! (:channel (first ch))
+                                (-> {:type "new-user"
+                                     :list (-> #(dissoc % :channel)
+                                               (map @channels))}
+                                    (cs/generate-string))
+                                false)
+                         (rest ch))))))))
+
+(defn on-open
+  [channel]
+  (if (websocket? channel)
+      (do (println "WebSocket channel")
+          (swap! channels conj {:user @current-user
+                                :channel channel})
+          (loop [ch @channels]
+            (if (empty? ch)
+              (do (println @channels))
+              (recur (do (send! (:channel (first ch))
+                                (-> {:type "new-user"
+                                     :list (-> #(dissoc % :channel)
+                                               (map @channels))}
+                                    (cs/generate-string))
+                                false)
+                         (rest ch))))))
+      (println "HTTP channel")))
+
 (defn handler [req]
   (with-channel req channel              ; get the channel
                                          ;; communicate with client using method defined above
-                (on-close channel (fn [status]
-                                    (do (reset! channels
-                                                (vec (remove #(= channel (:channel %)) @channels)))
-                                        (loop [ch @channels]
-                                          (if (empty? ch)
-                                              (do (println @channels))
-                                              (recur (do (send! (:channel (first ch))
-                                                                (-> {:type "new-user"
-                                                                     :list (-> #(dissoc % :channel)
-                                                                               (map @channels))}
-                                                                    (cs/generate-string))
-                                                                false)
-                                                         (rest ch))))))))
-                (if (websocket? channel)
-                    (do (println "WebSocket channel")
-                        (swap! channels conj {:user @current-user
-                                              :channel channel})
-                        (loop [ch @channels]
-                          (if (empty? ch)
-                              (do (println @channels))
-                              (recur (do (send! (:channel (first ch))
-                                                (-> {:type "new-user"
-                                                     :list (-> #(dissoc % :channel)
-                                                               (map @channels))}
-                                                    (cs/generate-string))
-                                                false)
-                                         (rest ch))))))
-                    (println "HTTP channel"))
-                (on-receive channel (fn [data]
-                                      (loop [ch @channels]
-                                        (if (empty? ch)
-                                            (do (println @channels))
-                                            (recur (do (send! (:channel (first ch))
-                                                              (let [map-data (cs/parse-string data true)]
-                                                                (-> (assoc map-data :type "message")
-                                                                    (cs/generate-string)))
-                                                              false)
-                                                       (rest ch)))))))))
+                (on-close channel on-channel-close)
+                (on-open channel)
+                (on-receive channel on-receive-data)))
 
 (defn homepage [req]
   (page/render-file "public/home.html"

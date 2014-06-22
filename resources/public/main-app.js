@@ -51,12 +51,15 @@ app.controller('MainCtrl', ['$scope', '$http', function ($scope, $http) {
 	};
 
 	$scope.sendChat = function ( message ) {
-		var data = {
-			user : user,
-			message : message
-		};
-		myWebSocket.send(JSON.stringify(data));
-		$scope.message = "";
+		if (message.length != 0) {
+			var data = {
+				user: user,
+				message: message,
+				dataType : "message"
+			};
+			myWebSocket.send(JSON.stringify(data));
+			$scope.message = "";
+		}
 
 	}
 }])

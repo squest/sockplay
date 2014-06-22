@@ -23,10 +23,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="chat.html" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="chat.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/chat.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-11.769231" vertical-offset="595" max-vertical-offset="1598">
+            <state vertical-scroll-proportion="0.29541865" vertical-offset="714" max-vertical-offset="1598">
               <caret line="53" column="16" selection-start-line="53" selection-start-column="16" selection-end-line="53" selection-end-column="16" />
               <folding>
                 <element signature="n#style#0;n#span#0;n#p#0;n#div#0;n#header#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -36,11 +36,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main-app.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="main-app.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main-app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.17708333" vertical-offset="0" max-vertical-offset="1139">
-              <caret line="7" column="20" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="518" max-vertical-offset="1190">
+              <caret line="57" column="32" selection-start-line="57" selection-start-column="32" selection-end-line="57" selection-end-column="32" />
               <folding />
             </state>
           </provider>
@@ -349,22 +349,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/main-app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="518" max-vertical-offset="1190">
+          <caret line="57" column="32" selection-start-line="57" selection-start-column="32" selection-end-line="57" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/chat.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-11.769231" vertical-offset="595" max-vertical-offset="1598">
+        <state vertical-scroll-proportion="0.29541865" vertical-offset="714" max-vertical-offset="1598">
           <caret line="53" column="16" selection-start-line="53" selection-start-column="16" selection-end-line="53" selection-end-column="16" />
           <folding>
             <element signature="n#style#0;n#span#0;n#p#0;n#div#0;n#header#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#span#1;n#p#0;n#div#0;n#header#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main-app.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.17708333" vertical-offset="0" max-vertical-offset="1139">
-          <caret line="7" column="20" selection-start-line="7" selection-start-column="20" selection-end-line="7" selection-end-column="20" />
-          <folding />
         </state>
       </provider>
     </entry>
