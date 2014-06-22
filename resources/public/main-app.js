@@ -14,7 +14,7 @@ var transContent = function  (domElmt) {
 };
 
 app.run(['$rootScope', function ($rootScope) {
-	$rootScope.myWebSocket = new WebSocket("ws://localhost:3000/ws");
+	$rootScope.myWebSocket = new WebSocket("ws://192.168.0.123:3000/ws");
 }])
 
 app.directive('zensoal', [function () {
