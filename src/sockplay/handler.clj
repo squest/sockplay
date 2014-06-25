@@ -116,9 +116,12 @@
            (GET "/" [req] homepage)
            (POST "/login" req
                  (do (println req)
-                     (let [user (:username (:params req))]
-                       (do (reset! current-user (str user))
-                           (chatpage (str user))))))
+                     (let [user (:username (:params req))
+                           chatroom (:chatroom (:params req))]
+                       (do (reset! current-user {:username (str user)
+                                                 :chatroom (str chatroom)})
+                           (chatpage {:username (str user)
+                                      :chatroom (str chatroom)})))))
            (GET "/ws" req
                 (do (println req)
                     (handler req)))       ;; websocket

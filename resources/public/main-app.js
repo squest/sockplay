@@ -29,6 +29,7 @@ app.directive('zensoal', [function () {
 			$scope.answerSoal = function ( answer ) {
 				var packageJawaban = {
 					user : user,
+					chatroom : chatroom,
 					dataType : "answer",
 					message : answer
 				}
@@ -53,7 +54,6 @@ app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope
 
 
 	$rootScope.myWebSocket.onopen = function(evt) {
-
 		console.log(evt);
 	};
 
@@ -87,6 +87,7 @@ app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope
 		if (message.length != 0) {
 			var data = {
 				user: user,
+				chatroom: chatroom,
 				message: message,
 				dataType : "message"
 			};
