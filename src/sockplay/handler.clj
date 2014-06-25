@@ -10,7 +10,7 @@
             [ring.middleware.session :as session]))
 
 (defonce server (atom nil))
-(def popop (atom 0))
+(def popop (atom 0N))
 
 (defn stop-server []
   (when-not (nil? @server)
@@ -18,6 +18,11 @@
     ;; :timeout is optional, when no timeout, stop immediately
     (@server :timeout 100)
     (reset! server nil)))
+
+; TODO Very very very IMPORTANT
+; channels is a vector of chatroom-map with each chatroom map as followed
+; {:chatroom-id [string] :users [vector of user-map}
+; Each user map is {:username :channel}
 
 (def channels (atom []))
 (def current-user (atom ""))
@@ -59,21 +64,6 @@
           (= "answer" (:dataType chan-data))
           (println chan-data))))
 
-(defn on-channel-close [channel]
-  (fn [status]
-      (do (reset! channels
-                  (vec (remove #(= channel (:channel %)) @channels)))
-          (loop [ch @channels]
-            (if (empty? ch)
-                (do (println @channels))
-                (recur (do (send! (:channel (first ch))
-                                  (-> {:type "new-user"
-                                       :list (-> #(dissoc % :channel)
-                                                 (map @channels))}
-                                      (cs/generate-string))
-                                  false)
-                           (rest ch))))))))
-
 (defn on-open
   [channel]
   (if (websocket? channel)
@@ -92,10 +82,22 @@
                            (rest ch))))))
       (println "HTTP channel")))
 
+
 (defn handler [req]
   (with-channel req channel              ; get the channel
-                                         ;; communicate with client using method defined above
-                (on-close channel on-channel-close)
+                (on-close channel (fn [status]
+                                    (do (reset! channels
+                                                (vec (remove #(= channel (:channel %)) @channels)))
+                                        (loop [ch @channels]
+                                          (if (empty? ch)
+                                              (do (println @channels))
+                                              (recur (do (send! (:channel (first ch))
+                                                                (-> {:type "new-user"
+                                                                     :list (-> #(dissoc % :channel)
+                                                                               (map @channels))}
+                                                                    (cs/generate-string))
+                                                                false)
+                                                         (rest ch))))))))
                 (on-open channel)
                 (on-receive channel on-receive-data)))
 
@@ -117,9 +119,6 @@
                      (let [user (:username (:params req))]
                        (do (reset! current-user (str user))
                            (chatpage (str user))))))
-           (GET "/chat" req
-                (do (println req)
-                    (chatpage (:user (:my-session req)))))
            (GET "/ws" req
                 (do (println req)
                     (handler req)))       ;; websocket
