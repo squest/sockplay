@@ -10,3 +10,5 @@ pom.xml.asc
 /.nrepl-port
 /.idea
 *.xml
+config.edn
+config.js

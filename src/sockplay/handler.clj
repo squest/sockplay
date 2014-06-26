@@ -21,7 +21,7 @@
 
 ; TODO Very very very IMPORTANT
 ; channels is a vector of channels' data with each channel's map consists of
-; {:user :chatroom :message :dataType }
+; {:user :chatroom :message }
 
 (def channels (atom []))
 (def current-user (atom ""))
@@ -150,7 +150,7 @@
 (defn chatpage [user]
   (page/render-file "public/chat.html"
                     {:page {:title "Let's chat"
-                            :headline "Hello joon"}
+                            :headline "Hello jon"}
                      :user user}))
 
 (defroutes all-routes
