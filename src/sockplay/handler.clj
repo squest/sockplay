@@ -10,7 +10,6 @@
             [ring.middleware.session :as session]))
 
 (defonce server (atom nil))
-(def popop (atom 0N))
 
 (defn stop-server []
   (when-not (nil? @server)
@@ -19,126 +18,97 @@
     (@server :timeout 100)
     (reset! server nil)))
 
-; TODO Very very very IMPORTANT
-; channels is a vector of channels' data with each channel's map consists of
-; {:user :chatroom :message }
+(def ^:private chatrooms
+  "List of chatrooms available on server, chatroom's name as key and
+  the number of users in chatroom as value"
+  (atom {}))
 
-(def channels (atom []))
-(def current-user (atom ""))
+(def channels
+  "Global atom that consists of all channels in the machine, it is a vector of channel maps,
+  each channel map contains {:username [string] :chatroom [string] :channel [native http-kit channel]}"
+  (atom []))
 
-(defn send-message
-  [data]
-  (loop [ch @channels]
-    (if (empty? ch)
-        (do (println @channels))
-        (recur (do (send! (:channel (first ch))
-                          (let [map-data (cs/parse-string data true)]
-                            (-> (assoc map-data :type "message")
-                                (cs/generate-string)))
-                          false)
-                   (rest ch))))))
+(def ^:private current-user
+  "A helper atom to represents the newly join user, I dont yet know how to pass this kind of info from http
+  session through websocket, thus an ugly implementation using this module-wide atom"
+  (atom ""))
 
-(defn send-message-to-room
+(defn- send-message-to-room
+  "Accepts data sent by an individual user, and will echo the data to all users subscribed to a
+  particular chatroom in which the user is send the data from"
   [data]
   (let [map-data (cs/parse-string data true)
         room-channel (filter #(= (:chatroom map-data)
                                  (:chatroom %))
                              @channels)]
-    (loop [ch room-channel]
-      (if (empty? ch)
-          (do (println room-channel))
-          (recur (do (send! (:channel (first ch))
-                            (-> (assoc map-data :type "message")
-                                (cs/generate-string))
-                            false)
-                     (rest ch)))))))
+    (doseq [ch room-channel]
+      (send! (:channel ch)
+             (-> (assoc map-data :type "message")
+                 (cs/generate-string))
+             false))))
 
-; FIXME this is just boong-boongan
-(defn send-soal-to-room
-  [data]
-  (let [map-data (cs/parse-string data true)
-        room-channel (filter #(= (:chatroom map-data)
-                                 (:chatroom %))
-                             @channels)]
-    (loop [ch room-channel]
-      (if (empty? ch)
-        (do (println room-channel))
-        (recur (do (send! (:channel (first ch))
-                          (-> (assoc map-data :type "message")
-                              (cs/generate-string))
-                          false)
-                   (rest ch)))))))
-
-(defn send-soal
-  [data]
-  (loop [ch @channels]
-    (if (empty? ch)
-        (do (println @channels))
-        (recur (do (send! (:channel (first ch))
-                          (let [map-data (cs/parse-string data true)]
-                            (-> (assoc map-data :type "soal")
-                                (cs/generate-string)))
-                          false)
-                   (rest ch))))))
-
-(defn uuid [] (str (java.util.UUID/randomUUID)))
-
-(defn on-receive-data
+(defn- on-receive-data
+  "A callback function to handle on-receive websocket event, data is the data sent by a particular user,
+  a typical JSON file as the front-end is (still) in Angular, I use cond just in case we have other
+  data types other than just 'message'"
   [data]
   (let [chan-data (cs/parse-string data true)]
     (cond (= "message" (:dataType chan-data))
-          (if (zero? (rem @popop 10))
-              (do (send-message-to-room data)
-                  (send-soal data)
-                  (swap! popop inc))
-              (do (send-message-to-room data)
-                  (swap! popop inc)))
-          (= "answer" (:dataType chan-data))
-          (println chan-data))))
+          (send-message-to-room data))))
 
-(defn on-open
+(defn- on-open
+  "A callback to handle on channel open event, which is an event where a single user open a connection to
+  the server from the browser, channel is the default channel data passed from http-kit"
   [channel]
   (if (websocket? channel)
-      (do (println "WebSocket channel")
-          (swap! channels conj (assoc @current-user
-                                      :channel channel))
-          (loop [ch (filter #(= (:chatroom @current-user)
-                                (:chatroom %))
-                            @channels)]
-            (if (empty? ch)
-                (do (println @channels))
-                (recur (do (send! (:channel (first ch))
-                                  (-> {:type "new-user"
-                                       :list (-> #(dissoc % :channel)
-                                                 (map (filter #(= (:chatroom @current-user)
-                                                                  (:chatroom %))
-                                                              @channels)))}
-                                      (cs/generate-string))
-                                  false)
-                           (rest ch))))))
-      (println "HTTP channel")))
+      (do (swap! channels conj (assoc @current-user
+                               :channel channel))
+          (let [chans (filter #(= (:chatroom @current-user)
+                                  (:chatroom %))
+                              @channels)]
+            (doseq [ch chans]
+              (send! (:channel ch)
+                     (-> {:type "users"
+                          :list (-> #(dissoc % :channel)
+                                    (map chans))}
+                         (cs/generate-string))
+                     false))))
+      (do (println "HTTP channel")
+          (cs/generate-string {:status false :message "Sorry, no http served on this page"}))))
 
 
-(defn handler [req]
-  (with-channel req channel              ; get the channel
+(defn handler
+  "Handler for the websocket connection, this is a default template from http-kit, I still can't find
+  a way to make on-close function that can handle this event from outside the handler, it seems do not
+  work from outside the handler"
+  ;TODO how to make the on-close channel from outside the handler
+  [req]
+  (with-channel req channel           ; get the channel
                 (on-close channel
                           (fn [status]
-                            (do (reset! channels
-                                        (vec (remove #(= channel (:channel %)) @channels)))
-                                (loop [ch (filter #(= (:chatroom @current-user)
-                                                      (:chatroom %))
-                                                  @channels)]
-                                  (if (empty? ch)
-                                      (do (println @channels))
-                                      (recur (do (send! (:channel (first ch))
-                                                        (-> {:type "new-user"
-                                                             :list (-> #(dissoc % :channel)
-                                                                       (map (filter #(= (:chatroom @current-user)
-                                                                                        (:chatroom %))
-                                                                                    @channels)))}
-                                                            (cs/generate-string))
-                                                        false)
-                                                 (rest ch))))))))
+                            (let [chatroom (filter #(= channel
+                                                       (:channel %))
+                                                   @channels)]
+                              (do (reset! channels
+                                          (vec (remove #(= channel (:channel %)) @channels)))
+                                  (if (= 1 (get @chatrooms (:chatroom chatroom)))
+                                      (swap! chatrooms
+                                             dissoc
+                                             (:chatroom chatroom))
+                                      (swap! chatrooms
+                                             assoc
+                                             (:chatroom chatroom)
+                                             (inc (get @chatrooms (:chatroom chatroom)))))
+                                  (let [chans (filter #(= (:chatroom chatroom)
+                                                          (:chatroom %))
+                                                      @channels)]
+                                    (doseq [ch chans]
+                                      (send! (:channel ch)
+                                             (-> {:type "users"
+                                                  :list (-> #(dissoc % :channel)
+                                                            (map chans))}
+                                                 (cs/generate-string))
+                                             false)))))))
                 (on-open channel)
                 (on-receive channel on-receive-data)))
 
@@ -147,11 +117,11 @@
                     {:page {:title "Welcome"
                             :headline "Hello Jon"}}))
 
-(defn chatpage [user]
+(defn chatpage [usermap]
   (page/render-file "public/chat.html"
                     {:page {:title "Let's chat"
                             :headline "Hello jon"}
-                     :user user}))
+                     :user usermap}))
 
 (defroutes all-routes
            (GET "/" [req] homepage)
@@ -161,10 +131,13 @@
                            chatroom (:chatroom (:params req))]
                        (do (reset! current-user {:username (str user)
                                                  :chatroom (str chatroom)})
+                           (swap! chatrooms assoc
+                                            (:chatroom (:params req))
+                                            (inc (get @chatrooms
+                                                      (:chatroom (:params req))
+                                                      0)))
                            (chatpage {:username (str user)
                                       :chatroom (str chatroom)})))))
-           (GET "/private/:user1/:user2/:uuid" [user1 user2 uuid]
-                nil)
            (GET "/ws" req
                 (do (println req)
                     (handler req)))       ;; websocket

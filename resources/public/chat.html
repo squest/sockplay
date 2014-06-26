@@ -36,12 +36,27 @@
 
 
 <body ng-app="chatApp" ng-controller="MainCtrl" class="large-12 column">
+	<div class="large-3 column">
+		<br/>
+		<h4>
+			Quest Chat Engine
+		</h4>
+		<fieldset>
+			<legend id="bobola"></legend>
+			<ol>
+				<li ng-repeat="item in users" >
+					{{item.username}}
+				</li>
+			</ol>
+
+		</fieldset>
+	</div>
    <header class="large-9 column">
 
 	   <form>
 		   <fieldset>
 			   <div class="large-11 columns">
-				   <input type="text" ng-model="message"/>
+				   <input type="text" ng-model="message" placeholder="Type your message and press ENTER to send chat message"/>
 			   </div>
 			   <div class="large-1 columns">
 				   <button ng-click="sendChat(message)" class="tiny">Send</button>
@@ -65,18 +80,7 @@
 	      </p>
 	   </div>
    </header>
-   <div class="large-3 column">
-	   <fieldset>
-		   <legend id="bobola"></legend>
-		   <ol>
-			   <li ng-repeat="item in users" >
-				   {{item.username}}
-				   <a href="/private/{{username}}/{{item.username}}/{{uuid()}}" target="_blank">japri</a>
-			   </li>
-		   </ol>
 
-	   </fieldset>
-   </div>
    <script>
 	   document.getElementById("bobola").innerHTML = "Users in " + chatroom;
    </script>

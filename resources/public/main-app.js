@@ -4,6 +4,7 @@
 
 var app = angular.module('chatApp', []);
 
+var baseSocketURL = "ws://localhost:3000/ws";
 
 var AnimDuration = 4000;
 
@@ -14,51 +15,12 @@ var transContent = function  (domElmt) {
 };
 
 app.run(['$rootScope', function ($rootScope) {
-	$rootScope.myWebSocket = new WebSocket("ws://192.168.1.155:3000/ws");
-}])
-
-app.directive('zensoal', [function () {
-	return {
-
-		templateUrl: '/directive-templates/zensoal.html',
-		replace: false,
-		transclude: true,
-		restrict: 'E',
-		scope: {},
-		controller: function ($scope, $element, $attrs, $transclude, $rootScope) {
-			$scope.answerSoal = function ( answer ) {
-				var packageJawaban = {
-					username : username,
-					chatroom : chatroom,
-					dataType : "answer",
-					message : answer
-				}
-				$rootScope.myWebSocket.send(JSON.stringify(packageJawaban));
-				console.log(packageJawaban);
-			}
-		},
-		compile: function compile(tElement, tAttrs, transclude) {
-			return function postLink(scope, iElement, iAttrs, controller) {
-
-			}
-		},
-		link: function postLink(scope, elmt, attrs) {
-
-		}
-	};
+	$rootScope.myWebSocket = new WebSocket(baseSocketURL);
 }])
 
 
 app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
 	$scope.messages = [];
-
-	$scope.uuid = function () {
-		return ((Math.round(Math.random()*100000)).toString() +
-			(Math.round(Math.random()*100000)).toString() +
-			(Math.round(Math.random()*100000)).toString() +
-			(Math.round(Math.random()*100000)).toString());
-	};
-
 
 	$rootScope.myWebSocket.onopen = function(evt) {
 		console.log(evt);
@@ -67,7 +29,7 @@ app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope
 	$rootScope.myWebSocket.onmessage = function(evt) {
 		var dataPackage = JSON.parse(evt.data);
 
-		if (dataPackage.type == "new-user") {
+		if (dataPackage.type == "users") {
 
 			$scope.users = [];
 
@@ -77,12 +39,11 @@ app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope
 			}
 
 		}
-		if ((dataPackage.type == "message") || (dataPackage.type == "soal")) {
+		if (dataPackage.type == "message") {
 			$scope.messages.unshift(dataPackage);
 			if ($scope.messages.length > 50) {
 				$scope.messages.pop();
 			}
-
 		}
 
 		$scope.$digest();
