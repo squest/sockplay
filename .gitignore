@@ -12,3 +12,4 @@ pom.xml.asc
 *.xml
 config.edn
 config.js
+/resources/public/.idea
