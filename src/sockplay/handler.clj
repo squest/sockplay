@@ -86,9 +86,9 @@
   (with-channel req channel           ; get the channel
                 (on-close channel
                           (fn [status]
-                            (let [chatroom (filter #(= channel
-                                                       (:channel %))
-                                                   @channels)]
+                            (let [chatroom (first (filter #(= channel
+                                                              (:channel %))
+                                                          @channels))]
                               (do (reset! channels
                                           (vec (remove #(= channel (:channel %)) @channels)))
                                   (if (= 1 (get @chatrooms (:chatroom chatroom)))
@@ -98,7 +98,7 @@
                                       (swap! chatrooms
                                              assoc
                                              (:chatroom chatroom)
-                                             (inc (get @chatrooms (:chatroom chatroom)))))
+                                             (dec (get @chatrooms (:chatroom chatroom)))))
                                   (let [chans (filter #(= (:chatroom chatroom)
                                                           (:chatroom %))
                                                       @channels)]
@@ -115,7 +115,10 @@
 (defn homepage [req]
   (page/render-file "public/home.html"
                     {:page {:title "Welcome"
-                            :headline "Hello Jon"}}))
+                            :headline "Hello Jon"}
+                     :chatrooms (map #(hash-map :roomname (key %)
+                                                :users-count (val %))
+                                     @chatrooms)}))
 
 (defn chatpage [usermap]
   (page/render-file "public/chat.html"

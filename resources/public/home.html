@@ -29,12 +29,24 @@
 <header>
 	<h1>{{page.headline}}</h1>
 
-	<div class="large-4 large-centered columns">
+	<div class="large-6 large-centered columns">
 		<form action="/login" method="post">
 			<input type="text" name="username" placeholder="username"/>
-			<input type="text" name="chatroom" placeholder="chatroom name?"/>
+			<input type="text" name="chatroom" placeholder="chatroom name (choose from available rooms below or create a new one)"/>
 			<button type="submit">Submit</button>
 		</form>
+		<br/>
+		<h5>
+			Available Chatrooms
+		</h5>
+		<ol>
+			{% for item in chatrooms %}
+			<li>
+				{{item.roomname}} &nbsp; ({{item.users-count}} user(s) in the room)
+			</li>
+			{% endfor %}
+		</ol>
+
 	</div>
 
 

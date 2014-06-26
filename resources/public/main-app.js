@@ -20,6 +20,9 @@ app.run(['$rootScope', function ($rootScope) {
 
 
 app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
+	window.onunload = function () {
+	   $rootScope.myWebSocket.close();
+	}
 	$scope.messages = [];
 
 	$rootScope.myWebSocket.onopen = function(evt) {
