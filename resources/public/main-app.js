@@ -14,7 +14,7 @@ var transContent = function  (domElmt) {
 };
 
 app.run(['$rootScope', function ($rootScope) {
-	$rootScope.myWebSocket = new WebSocket("ws://localhost:3000/ws");
+	$rootScope.myWebSocket = new WebSocket("ws://192.168.1.155:3000/ws");
 }])
 
 app.directive('zensoal', [function () {
@@ -28,7 +28,7 @@ app.directive('zensoal', [function () {
 		controller: function ($scope, $element, $attrs, $transclude, $rootScope) {
 			$scope.answerSoal = function ( answer ) {
 				var packageJawaban = {
-					user : user,
+					username : username,
 					chatroom : chatroom,
 					dataType : "answer",
 					message : answer
@@ -51,6 +51,13 @@ app.directive('zensoal', [function () {
 
 app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
 	$scope.messages = [];
+
+	$scope.uuid = function () {
+		return ((Math.round(Math.random()*100000)).toString() +
+			(Math.round(Math.random()*100000)).toString() +
+			(Math.round(Math.random()*100000)).toString() +
+			(Math.round(Math.random()*100000)).toString());
+	};
 
 
 	$rootScope.myWebSocket.onopen = function(evt) {
@@ -86,7 +93,7 @@ app.controller('MainCtrl', ['$scope', '$rootScope', function ($scope, $rootScope
 	$scope.sendChat = function ( message ) {
 		if (message.length != 0) {
 			var data = {
-				user: user,
+				username: username,
 				chatroom: chatroom,
 				message: message,
 				dataType : "message"

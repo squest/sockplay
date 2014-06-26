@@ -20,9 +20,8 @@
     (reset! server nil)))
 
 ; TODO Very very very IMPORTANT
-; channels is a vector of chatroom-map with each chatroom map as followed
-; {:chatroom-id [string] :users [vector of user-map}
-; Each user map is {:username :channel}
+; channels is a vector of channels' data with each channel's map consists of
+; {:user :chatroom :message :dataType }
 
 (def channels (atom []))
 (def current-user (atom ""))
@@ -39,6 +38,37 @@
                           false)
                    (rest ch))))))
 
+(defn send-message-to-room
+  [data]
+  (let [map-data (cs/parse-string data true)
+        room-channel (filter #(= (:chatroom map-data)
+                                 (:chatroom %))
+                             @channels)]
+    (loop [ch room-channel]
+      (if (empty? ch)
+          (do (println room-channel))
+          (recur (do (send! (:channel (first ch))
+                            (-> (assoc map-data :type "message")
+                                (cs/generate-string))
+                            false)
+                     (rest ch)))))))
+
+; FIXME this is just boong-boongan
+(defn send-soal-to-room
+  [data]
+  (let [map-data (cs/parse-string data true)
+        room-channel (filter #(= (:chatroom map-data)
+                                 (:chatroom %))
+                             @channels)]
+    (loop [ch room-channel]
+      (if (empty? ch)
+        (do (println room-channel))
+        (recur (do (send! (:channel (first ch))
+                          (-> (assoc map-data :type "message")
+                              (cs/generate-string))
+                          false)
+                   (rest ch)))))))
+
 (defn send-soal
   [data]
   (loop [ch @channels]
@@ -51,15 +81,17 @@
                           false)
                    (rest ch))))))
 
+(defn uuid [] (str (java.util.UUID/randomUUID)))
+
 (defn on-receive-data
   [data]
   (let [chan-data (cs/parse-string data true)]
     (cond (= "message" (:dataType chan-data))
           (if (zero? (rem @popop 10))
-              (do (send-message data)
+              (do (send-message-to-room data)
                   (send-soal data)
                   (swap! popop inc))
-              (do (send-message data)
+              (do (send-message-to-room data)
                   (swap! popop inc)))
           (= "answer" (:dataType chan-data))
           (println chan-data))))
@@ -68,15 +100,19 @@
   [channel]
   (if (websocket? channel)
       (do (println "WebSocket channel")
-          (swap! channels conj {:user @current-user
-                                :channel channel})
-          (loop [ch @channels]
+          (swap! channels conj (assoc @current-user
+                                      :channel channel))
+          (loop [ch (filter #(= (:chatroom @current-user)
+                                (:chatroom %))
+                            @channels)]
             (if (empty? ch)
                 (do (println @channels))
                 (recur (do (send! (:channel (first ch))
                                   (-> {:type "new-user"
                                        :list (-> #(dissoc % :channel)
-                                                 (map @channels))}
+                                                 (map (filter #(= (:chatroom @current-user)
+                                                                  (:chatroom %))
+                                                              @channels)))}
                                       (cs/generate-string))
                                   false)
                            (rest ch))))))
@@ -85,19 +121,24 @@
 
 (defn handler [req]
   (with-channel req channel              ; get the channel
-                (on-close channel (fn [status]
-                                    (do (reset! channels
-                                                (vec (remove #(= channel (:channel %)) @channels)))
-                                        (loop [ch @channels]
-                                          (if (empty? ch)
-                                              (do (println @channels))
-                                              (recur (do (send! (:channel (first ch))
-                                                                (-> {:type "new-user"
-                                                                     :list (-> #(dissoc % :channel)
-                                                                               (map @channels))}
-                                                                    (cs/generate-string))
-                                                                false)
-                                                         (rest ch))))))))
+                (on-close channel
+                          (fn [status]
+                            (do (reset! channels
+                                        (vec (remove #(= channel (:channel %)) @channels)))
+                                (loop [ch (filter #(= (:chatroom @current-user)
+                                                      (:chatroom %))
+                                                  @channels)]
+                                  (if (empty? ch)
+                                      (do (println @channels))
+                                      (recur (do (send! (:channel (first ch))
+                                                        (-> {:type "new-user"
+                                                             :list (-> #(dissoc % :channel)
+                                                                       (map (filter #(= (:chatroom @current-user)
+                                                                                        (:chatroom %))
+                                                                                    @channels)))}
+                                                            (cs/generate-string))
+                                                        false)
+                                                 (rest ch))))))))
                 (on-open channel)
                 (on-receive channel on-receive-data)))
 
@@ -122,6 +163,8 @@
                                                  :chatroom (str chatroom)})
                            (chatpage {:username (str user)
                                       :chatroom (str chatroom)})))))
+           (GET "/private/:user1/:user2/:uuid" [user1 user2 uuid]
+                nil)
            (GET "/ws" req
                 (do (println req)
                     (handler req)))       ;; websocket

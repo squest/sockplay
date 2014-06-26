@@ -10,7 +10,7 @@
 
 	   <link rel="stylesheet" href="app-scss/main-style.css">
 	   <script>
-		   var user= "{{user.username}}";
+		   var username= "{{user.username}}";
 		   var chatroom = "{{user.chatroom}}"
 	   </script>
 	   <!-- external JS -->
@@ -53,7 +53,7 @@
 		   <p id="message{{$index}}" ng-repeat="item in messages" ng-class-even="'zpanel1'" ng-class-odd="'zpanel2'">
 
 			   <span ng-if="item.type == 'message'">
-				   <span style="color: #5a009e;">{{item.user}}</span> :
+				   <span style="color: #5a009e;">{{item.username}}</span> :
 					<span style="color: #333333">{{item.message}} </span>
 			   </span>
 			   <span ng-if="item.type == 'soal'">
@@ -70,7 +70,8 @@
 		   <legend id="bobola"></legend>
 		   <ol>
 			   <li ng-repeat="item in users" >
-				   {{item.user}}
+				   {{item.username}}
+				   <a href="/private/{{username}}/{{item.username}}/{{uuid()}}" target="_blank">japri</a>
 			   </li>
 		   </ol>
 
